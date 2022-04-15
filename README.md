@@ -1,5 +1,7 @@
-Magic square Solution
+Wordle solution 
 ======================
 
-This is implementation for https://www.cone.ee/test_eng.html
+This is reverse solution for word wide game Wordle. 
+
+Program can find answer for any hidden word
 

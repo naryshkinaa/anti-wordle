@@ -1,4 +1,4 @@
-name := "digit_game"
+name := "anti-wordle"
 
 version := "0.1"
 
