@@ -27,7 +27,7 @@ object RunService {
 
     if(isLog) println(s"Hidden word: $answer")
     val result = nextStep(Situation(Nil), 1)
-    if(result >= 9) println(s"Hidden word: $answer")
+    if(result >= 7) println(s"Hidden word: $answer")
     result
   }
 

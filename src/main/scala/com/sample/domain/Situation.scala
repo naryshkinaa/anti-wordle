@@ -1,6 +1,10 @@
 package com.sample.domain
 
 case class WordCheck(chars: List[(Char, CharResult)]) {
+
+  private def exist(char: Char): Boolean = {
+    chars.exists(f => f._1 == char && (f._2 == CharInPosition || f._2 == CharNotInPosition))
+  }
   def inPosition: Map[Int, Char] = {
     chars
       .zipWithIndex
@@ -9,10 +13,10 @@ case class WordCheck(chars: List[(Char, CharResult)]) {
       .toMap
   }
 
-  def notInPosition: Map[Char, Set[Int]] = {
+  def deprecatedPositions: Map[Char, Set[Int]] = {
     chars
       .zipWithIndex
-      .filter(_._1._2 == CharNotInPosition)
+      .filter(f => f._1._2 == CharNotInPosition || f._1._2 == CharMissed && exist(f._1._1) )
       .map(f => f._2 -> f._1._1)
       .groupBy(_._2)
       .view
@@ -20,11 +24,22 @@ case class WordCheck(chars: List[(Char, CharResult)]) {
       .toMap
   }
 
-  def missed: Set[Char] = {
+  def missedChars: Set[Char] = {
     chars
-      .filter(_._2 == CharMissed)
+      .filter(c => c._2 == CharMissed && !exist(c._1))
       .map(_._1)
       .toSet
+  }
+
+  def knownChars: Map[Char, Int] = {
+    val allChars = inPosition.values ++ chars
+      .filter(_._2 == CharNotInPosition)
+      .map(_._1)
+    allChars
+      .groupBy(identity)
+      .view
+      .mapValues(_.size)
+      .toMap
   }
 }
 
@@ -32,15 +47,16 @@ case class Situation(wordsCheck: List[WordCheck])
 
 case class FoldedSituation(
                             inPosition: Map[Int, Char],
-                            notInPosition: Map[Char, Set[Int]],
-                            missed: Set[Char]
+                            deprecatedPositions: Map[Char, Set[Int]],
+                            missedChars: Set[Char],
+                            knownChars: Map[Char, Int]
                           ) {
   def checkWord(word: String): Boolean = {
-    val missedCondition = word.toCharArray.forall(!missed.contains(_))
-    val inCondition =  inPosition.forall(f => word.charAt(f._1) == f._2)
-    val notInConditional =  notInPosition.forall(
-        f => f._2.forall(p => word.charAt(p) != f._1) && word.toCharArray.contains(f._1)
-      )
-    missedCondition && inCondition && notInConditional
+    val missedCondition = word.toCharArray.forall(!missedChars.contains(_))
+    val inCondition = inPosition.forall(f => word.charAt(f._1) == f._2)
+    val notInConditional = deprecatedPositions.forall(f => f._2.forall(p => word.charAt(p) != f._1))
+    val charCount = word.toCharArray.groupBy(identity).mapValues(_.length).toMap
+    val knownCharsConditional = knownChars.forall(f => f._2 <= charCount.getOrElse(f._1, 0))
+    missedCondition && inCondition && notInConditional && knownCharsConditional
   }
 }
