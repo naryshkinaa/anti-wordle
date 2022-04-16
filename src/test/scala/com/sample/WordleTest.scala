@@ -9,7 +9,7 @@ class WordleTest extends AnyFunSpec {
     "каска" -> 6,
     "тутти" -> 5,
     "эрзац" -> 5,
-    "щетка"-> 6,
+    "щетка" -> 6,
     "филин" -> 4,
     "фаска" -> 6,
     "хамка" -> 6,
@@ -17,6 +17,12 @@ class WordleTest extends AnyFunSpec {
     "чабан" -> 6,
     "шашка" -> 6,
     "щучка" -> 6,
+    "бочок" -> 6,
+    "божок" -> 6,
+    "дачка" -> 6,
+    "давка" -> 6,
+    "пучка" -> 6,
+    "пучка" -> 6,
     "чашка" -> 6
   )
 
@@ -27,6 +33,6 @@ class WordleTest extends AnyFunSpec {
     }
   )
   it("Simple word run") {
-    val result = RunService.simulateGame("шашка", true)
+    val result = RunService.simulateGame("дачка", true)
   }
 }

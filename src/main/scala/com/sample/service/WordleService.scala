@@ -3,6 +3,7 @@ package com.sample.service
 import com.sample.domain.{FoldedSituation, Situation}
 
 import scala.io.Source
+import scala.util.Random
 
 object WordleService {
 
@@ -35,6 +36,8 @@ object WordleService {
     if (subDictionary.size <= 2) return subDictionary.head
     val notFixedPositions = Set(0, 1, 2, 3, 4) -- foldedSituation.inPosition.keys
     val frequencyMap = collection.mutable.Map[(Char, Int), Int]()
+    val doubleCharMap = collection.mutable.Map[Char, Int]()
+    val tripleCharMap = collection.mutable.Map[Char, Int]()
     val frequencyTotalMap = collection.mutable.Map[Char, Int]()
     for (
       word <- subDictionary;
@@ -45,6 +48,23 @@ object WordleService {
       frequencyMap.put((char, i), count + 1)
       val countTotal = frequencyTotalMap.getOrElse(char, 0)
       frequencyTotalMap.put(char, countTotal + 1)
+    }
+
+    subDictionary.foreach {
+      word =>
+        word
+          .toCharArray
+          .groupBy(identity)
+          .filter(_._2.length >= 2)
+          .foreach {
+            case (char, list) =>
+              val count = doubleCharMap.getOrElse(char, 0)
+              doubleCharMap.put(char, count + 1)
+              if (list.length == 3) {
+                val count2 = tripleCharMap.getOrElse(char, 0)
+                tripleCharMap.put(char, count2 + 1)
+              }
+          }
     }
 
     val cache = collection.mutable.Map[(Char, Int), Int]()
@@ -73,7 +93,14 @@ object WordleService {
 
     def multipleCharScore(char: Char, positions: List[Int]): Int = {
       val bestBySingle = positions.map(p => uniqueCharScore(char, p)).max
-      bestBySingle
+      val byDouble =
+        if (foldedSituation.knownChars.getOrElse(char, 0) < positions.length) {
+          if (positions.length == 2) doubleCharMap.get(char).map(_ - 1).getOrElse(0)
+          else tripleCharMap.getOrElse(char, 0)
+        }
+        else 0
+
+      bestBySingle + byDouble
     }
 
     def wordScore(word: String): Int = {
@@ -93,7 +120,10 @@ object WordleService {
       scored.sum
     }
 
-    dictionary.maxBy(wordScore)
+    val byPriority = dictionary.map(w => w -> wordScore(w)).sortBy(_._2)
+    val top1 = dictionary.length / 100
+    if (subDictionary.length == dictionary.length) byPriority(Random.nextInt(top1) + dictionary.length - top1)._1
+    else byPriority.last._1
   }
 
   def processSituation(situation: Situation): FoldedSituation = {
