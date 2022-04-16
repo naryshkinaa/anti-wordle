@@ -4,6 +4,7 @@ import com.sample.domain.{CharInPosition, CharMissed, CharNotInPosition}
 import com.sample.service.WordleService
 import com.sample.util.{RunService, WordCheckUtil}
 import org.scalatest.funspec.AnyFunSpec
+import scala.collection.parallel.CollectionConverters._
 
 class FullDictTest extends AnyFunSpec{
 
@@ -11,6 +12,7 @@ class FullDictTest extends AnyFunSpec{
     val start = System.currentTimeMillis()
     val result = WordleService
       .dictionary
+      .par
       .map(RunService.simulateGame(_,false))
     result
       .groupBy(identity)
@@ -26,11 +28,11 @@ class FullDictTest extends AnyFunSpec{
 }
 
 //1 - 1
-//2 - 106
-//3 - 1063
-//4 - 1693
-//5 - 558
-//6 - 60
-//7 - 2
-//Average 3.8294573643410854
-//Time total (sec): 290
+//2 - 92
+//3 - 1051
+//4 - 1819
+//5 - 481
+//6 - 36
+//7 - 3
+//Average 3.805914441573356
+//Time total (sec): 35

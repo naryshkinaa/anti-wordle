@@ -17,6 +17,7 @@ class WordleTest extends AnyFunSpec {
     "чабан" -> 6,
     "шашка" -> 6,
     "щучка" -> 6,
+    "чашка" -> 6
   )
 
   words.foreach(

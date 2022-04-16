@@ -34,7 +34,6 @@ object WordleService {
 
     if (subDictionary.size <= 2) return subDictionary.head
     val notFixedPositions = Set(0, 1, 2, 3, 4) -- foldedSituation.inPosition.keys
-
     val frequencyMap = collection.mutable.Map[(Char, Int), Int]()
     val frequencyTotalMap = collection.mutable.Map[Char, Int]()
     for (
@@ -48,21 +47,28 @@ object WordleService {
       frequencyTotalMap.put(char, countTotal + 1)
     }
 
+    val cache = collection.mutable.Map[(Char, Int), Int]()
+
     def uniqueCharScore(char: Char, pos: Int): Int = {
-      if (foldedSituation.inPosition.getOrElse(pos, null) == char) 0
-      else {
-        if (foldedSituation.inPosition.values.exists(_ == char)) frequencyMap.getOrElse((char, pos), 0)
-        else {
-          if (foldedSituation.knownChars.contains(char)) {
-            frequencyMap.getOrElse((char, pos), 0)
-          }
+      cache.getOrElseUpdate(
+        (char, pos),
+        {
+          if (foldedSituation.inPosition.getOrElse(pos, null) == char) 0
           else {
-            notFixedPositions
-              .map(p => frequencyMap.getOrElse((char, p), 0))
-              .sum + frequencyMap.getOrElse((char, pos), 0) / 2
+            if (foldedSituation.inPosition.values.exists(_ == char)) frequencyMap.getOrElse((char, pos), 0)
+            else {
+              if (foldedSituation.knownChars.contains(char)) {
+                frequencyMap.getOrElse((char, pos), 0)
+              }
+              else {
+                notFixedPositions
+                  .map(p => frequencyMap.getOrElse((char, p), 0))
+                  .sum + frequencyMap.getOrElse((char, pos), 0) / 2
+              }
+            }
           }
         }
-      }
+      )
     }
 
     def multipleCharScore(char: Char, positions: List[Int]): Int = {
@@ -71,12 +77,13 @@ object WordleService {
     }
 
     def wordScore(word: String): Int = {
-      val groups: Map[Char, List[Int]] = word
-        .toCharArray
-        .zipWithIndex
-        .groupBy(_._1)
-        .mapValues(_.map(_._2).toList)
-        .toMap
+      val groups = collection.mutable.Map[Char, List[Int]]()
+      (0 to 4).map {
+        i =>
+          val char = word.charAt(i)
+          val list = groups.getOrElse(char, Nil)
+          groups.put(char, list :+ i)
+      }
 
       val scored = groups
         .map {
@@ -86,9 +93,7 @@ object WordleService {
       scored.sum
     }
 
-    val tmp = dictionary.sortBy(wordScore).reverse
-    //    dictionary.maxBy(wordScore)
-    tmp.head
+    dictionary.maxBy(wordScore)
   }
 
   def processSituation(situation: Situation): FoldedSituation = {
@@ -123,5 +128,17 @@ object WordleService {
     FoldedSituation(inPosition, deprecatedPositions, missed, knownChars)
   }
 
+  val stats = collection.mutable.Map[String, Stat]()
+
+  def withStat[A](name: String)(f: => A): A = {
+    val start = System.currentTimeMillis()
+    val result = f
+    val current = stats.getOrElse(name, Stat(0, 0))
+    stats.put(name, Stat(current.count + 1, current.total + System.currentTimeMillis() - start))
+    result
+  }
+
 
 }
+
+case class Stat(count: Int, total: Long)
