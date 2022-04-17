@@ -100,7 +100,8 @@ export default {
 
 .buttonWrapper {
   display: inline-block;
-  margin-left: 20px;
+  margin-left: 10px;
+  float: left;
   margin-top: 18px;
   /*width: 200px;*/
   /*height: 40px;*/
@@ -113,6 +114,14 @@ export default {
   font-size: 15px;
   border-radius: 5px;
   border-width: 1px;
+}
+
+@media only screen and (max-width: 600px) {
+  .sendResult {
+    width: 50px;
+    height: 40px;
+    font-size: 11px;
+  }
 }
 
 .charInline {

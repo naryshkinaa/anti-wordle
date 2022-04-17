@@ -28,9 +28,9 @@ export default {
 <style>
 .infoRoot {
   position: absolute;
-  left: 30%;
+  left: 0;
   top:70px;
-  width: 40%;
+  width: 100%;
   height: calc(90% - 70px);
   background-color: lightblue;
 }
