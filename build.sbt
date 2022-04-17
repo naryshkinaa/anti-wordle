@@ -15,3 +15,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.2"
 )
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case PathList("reference.conf") => MergeStrategy.concat
+  case x => MergeStrategy.first
+}
