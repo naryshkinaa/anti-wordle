@@ -121,8 +121,8 @@ object WordleService {
     }
 
     val byPriority = dictionary.map(w => w -> wordScore(w)).sortBy(_._2)
-//    val top = dictionary.length / 100
-    val top = 1
+    val top = 20
+//    val top = 1
     if (subDictionary.length == dictionary.length) byPriority(Random.nextInt(top) + dictionary.length - top)._1
     else byPriority.last._1
   }
