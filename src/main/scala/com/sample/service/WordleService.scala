@@ -1,6 +1,6 @@
 package com.sample.service
 
-import com.sample.domain.{FoldedSituation, Situation}
+import com.sample.domain.{FoldedSituation, InvalidDataException, Situation}
 
 import scala.io.Source
 import scala.util.Random
@@ -32,7 +32,7 @@ object WordleService {
   def bestWord(foldedSituation: FoldedSituation): String = {
     val subDictionary = dictionary
       .filter(w => foldedSituation.checkWord(w))
-
+    if (subDictionary.isEmpty) throw InvalidDataException
     if (subDictionary.size <= 2) return subDictionary.head
     val notFixedPositions = Set(0, 1, 2, 3, 4) -- foldedSituation.inPosition.keys
     val frequencyMap = collection.mutable.Map[(Char, Int), Int]()
@@ -122,7 +122,7 @@ object WordleService {
 
     val byPriority = dictionary.map(w => w -> wordScore(w)).sortBy(_._2)
     val top = 20
-//    val top = 1
+    //    val top = 1
     if (subDictionary.length == dictionary.length) byPriority(Random.nextInt(top) + dictionary.length - top)._1
     else byPriority.last._1
   }

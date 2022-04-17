@@ -25,7 +25,15 @@ object MainRoute {
                   }
                 )
               )
-              val newWorld = WordleService.bestWord(Situation(wordChecks))
+
+              val newWorld =
+                try {
+                  WordleService.bestWord(Situation(wordChecks))
+                }
+                catch {
+                  case InvalidDataException => null
+                }
+
               complete(JsonUtil.toJson(NewWordResponse(newWorld)))
           }
         }

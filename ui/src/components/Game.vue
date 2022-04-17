@@ -37,7 +37,12 @@ export default {
     wordSended: function (data) {
       this.results.push(data);
       API.nextWord(this.results, response => {
-        this.words[this.results.length] = response.data.word.toUpperCase();
+        if(response.data.word == null) {
+          alert("Не существует слова с такими параметрами (или по крайней мере его нет в моей базе из 3000+ слов). \n Возможно вы ошиблись с указанием букв. \n В любом случаи сыграем еще?")
+        }else {
+          this.words[this.results.length] = response.data.word.toUpperCase();
+        }
+
       })
     }
   }
