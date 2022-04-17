@@ -1,7 +1,0 @@
-export const GameState = {
-    SELECT_GAME: "SELECT_GAME",
-    WAITING_OPPONENT: "WAITING_OPPONENT",
-    RUNNING: "RUNNING",
-    RESTORING: "RESTORING",
-
-};

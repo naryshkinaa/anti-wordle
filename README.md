@@ -14,11 +14,15 @@ Current statistics is
  - 6 - 66
  - Average 3.83
 
-## Run
+## Run local
 - server: standard Idea start RestBoot app
 - client: from <b>ui </b> folder
 - npm install
 - npm run serve
 - http://localhost:3000
+
+## Run production 
+- npm install
+- copy /ui/dist to src/resources/ui
 
 ![plot](./screen.png)
